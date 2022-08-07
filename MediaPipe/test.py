@@ -44,13 +44,25 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
 
             shoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
             hip = [landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].x,landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
-            knee = [landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].x,landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
+            knee = [landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].x,landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].y]
             ear = [landmarks[mp_pose.PoseLandmark.LEFT_EAR.value].x,landmarks[mp_pose.PoseLandmark.LEFT_EAR.value].y]
 
-            if(calculate_angle(shoulder, hip, knee) > 90 and calculate_angle(shoulder, hip, knee) < 109 and calculate_angle(ear, shoulder, hip) > 150):
+            hip_angle = calculate_angle(shoulder, hip, knee)
+            neck_angle = calculate_angle(ear, shoulder, hip)
+
+            if(hip_angle > 90 and hip_angle < 109 and calculate_angle(ear, shoulder, hip) > 150):
                 image = cv2.putText(image, 'GOOD POSTURE', (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
             else:
                 image = cv2.putText(image, 'BAD POSTURE', (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
+
+            # Visualize angle
+            cv2.putText(image, str('%.2f' % hip_angle), 
+                           tuple(np.multiply(hip, [1280, 720]).astype(int)), 
+                           cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 3, cv2.LINE_AA)
+
+            cv2.putText(image, str('%.2f' % neck_angle), 
+                           tuple(np.multiply(shoulder, [1280, 720]).astype(int)), 
+                           cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 3, cv2.LINE_AA)
 
 
         except:
